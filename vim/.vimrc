@@ -20,6 +20,7 @@ Plugin 'altercation/vim-colors-solarized'
 Plugin 'valloric/youcompleteme'
 Plugin 'tpope/vim-surround'
 Plugin 'raimondi/delimitmate'
+Plugin 'rust-lang/rust.vim'
 
 call vundle#end()
 
@@ -46,8 +47,16 @@ autocmd FileType yaml setlocal shiftwidth=2 softtabstop=2 expandtab
 " =====================================================================================
 " Generic keys
 let mapleader = " " " map leader to Space
+
+" Insert mode keybindings
 inoremap <C-j> <Esc>
+inoremap <C-k> <Esc> <bar> :w<CR>
+
+" Visual mode keybindings
 vnoremap <C-j> <Esc>
+
+" Normal mode keybindings
+nnoremap <C-k> :w<CR>
 
 " NERDTree keys
 nnoremap <leader>n :NERDTreeFocus<CR>
