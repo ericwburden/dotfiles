@@ -70,7 +70,7 @@ ZSH_THEME="mrtazz"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-dircolors-solarized)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -111,6 +111,9 @@ alias mkmv='(){ mkdir -p $1; mv $2 $1; }'
 alias dchdmi='xrandr --output HDMI-0 --off'
 alias hdmi='xrandr --output HDMI-0 --auto --left-of DP-2'
 alias bright='xrandr --output DP-2 --brightness $1'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ...='cd ../../..'
 
-# Use solarized dircolors
-eval `dircolors /home/eric/.dir_colors/dircolors`
+# Disable CTRL-S default behavior (freeze the terminal)
+stty -ixon
