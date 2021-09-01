@@ -1,0 +1,48 @@
+#! /bin/bash
+
+# Default folder name to 'julia' if none provided
+[ $# -eq 0 ] && dir="julia" || dir=$1
+dirpath="$PWD/$dir"
+window="${PWD##*/}"
+
+# Generate the package and files
+julia -e "using Pkg; Pkg.generate(\"$dir\"); Pkg.activate(\"$dir\"); Pkg.add(\"Test\");"
+
+# Create the tests file
+testpath="$dirpath/test"
+mkdir -p $testpath
+
+testfile="$testpath/runtests.jl"
+touch $testfile
+
+echo -e "using Test;" >> $testfile
+echo -e "using $dir;" >> $testfile
+echo -e "\n@testset \"Sample Test\" begin" >> $testfile
+echo -e "\t@test 1 == 1" >> $testfile
+echo -e "end" >> $testfile
+
+# Check if the named session exists. If not, create it. If so, add a window to it.
+tmux has-session -t $dir 2>/dev/null
+
+if [ $? != 0 ]; then
+    tmux new-session  -d -s $dir -n $window -c $dirpath 
+else 
+    tmux new-window -d -t "=$dir" -n $window -c $dirpath
+fi
+
+# Split the window and set layout
+tmux split-window -t "=$dir:=$window.0" -h -c $dirpath 
+tmux split-window -t "=$dir:=$window.1" -v -c $dirpath 
+tmux select-layout main-vertical
+
+# Open the editors/REPL
+tmux send-keys -t "=$dir:=$window.0" "nvim src/$dir.jl" Enter
+tmux send-keys -t "=$dir:=$window.1" "nvim $testfile" Enter
+tmux send-keys -t "=$dir:=$window.2" "julia" Enter
+
+# Activate the package in the Julia REPL
+tmux send-keys -t "=$dir:=$window.2" "]activate ." Enter
+
+# Attach to the new session
+echo -e "Switching to tmux session: =$dir:=$window.0"
+tmux switch-client -t "=$dir:=$window.0" 

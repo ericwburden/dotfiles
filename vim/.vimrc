@@ -21,6 +21,7 @@ Plugin 'valloric/youcompleteme'
 Plugin 'tpope/vim-surround'
 Plugin 'raimondi/delimitmate'
 Plugin 'rust-lang/rust.vim'
+Plugin 'vim-test/vim-test'
 
 call vundle#end()
 
@@ -37,10 +38,12 @@ set rnu             " Relative line numbers
 set colorcolumn=88  " Highlight column 88
 set laststatus=2    " Fix for lightline
 set noshowmode      " Hide --INSERT--
+set nohlsearch      " Lose highlighting after search
 
-" Override for .yaml files
-autocmd FileType yaml setlocal shiftwidth=2 softtabstop=2 expandtab
-
+" Override for specific file types
+autocmd FileType yaml  setlocal shiftwidth=2 softtabstop=2 expandtab
+autocmd FileType ruby  setlocal shiftwidth=2 tabstop=2     expandtab
+autocmd FileType eruby setlocal shiftwidth=2 tabstop=2     expandtab
 
 " =====================================================================================
 " ===                          Key Remappings                                       ===
@@ -63,6 +66,13 @@ nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
+
+" VimTest keys
+nmap <silent> t<C-n> :TestNearest<CR>
+nmap <silent> t<C-f> :TestFile<CR>
+nmap <silent> t<C-s> :TestSuite<CR>
+nmap <silent> t<C-l> :TestLast<CR>
+nmap <silent> t<C-g> :TestVisit<CR>
 
 
 " =====================================================================================

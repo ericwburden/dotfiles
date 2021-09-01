@@ -7,3 +7,10 @@ keysym Control_R = Caps_Lock
 keysym Caps_Lock = Control_R
 add Lock = Caps_Lock
 add Control = Control_R
+
+!
+! Change Alt_R to mod3
+!
+clear mod1
+add mod1 = Alt_L Meta_L
+add mod3 = Alt_R

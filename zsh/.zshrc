@@ -92,9 +92,9 @@ source $ZSH/oh-my-zsh.sh
 # export ARCHFLAGS="-arch x86_64"
 
 # Autostart tmux
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-    tmux attach -t default || tmux new -s default
-fi
+# if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+#     tmux attach -t default -c "$(pwd)" || tmux new -s default
+# fi
 
 # User Exports
 # export XTERM=xterm-256color
@@ -110,10 +110,15 @@ fi
 alias mkmv='(){ mkdir -p $1; mv $2 $1; }'
 alias dchdmi='xrandr --output HDMI-0 --off'
 alias hdmi='xrandr --output HDMI-0 --auto --left-of DP-2'
-alias bright='xrandr --output DP-2 --brightness $1'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ...='cd ../../..'
+alias CD='cd ~/open_source/CodingDojo'
+alias MCC='cd ~/projects/midday_coding_challenges'
+alias CW='cd ~/projects/code_wars'
 
 # Disable CTRL-S default behavior (freeze the terminal)
 stty -ixon
+
+# Created by `pipx` on 2021-06-15 02:08:36
+export PATH="$PATH:/home/eric/.local/bin"
