@@ -30,19 +30,19 @@ colors:
 # Font
 font:
   normal:
-    family: Inconsolata
+    family: Inconsolata Nerd Font
     style: Regular
 
   bold:
-    family: Inconsolata
+    family: Inconsolata Nerd Font
     style: Bold
 
   italic:
-    family: Inconsolata
+    family: Inconsolata Nerd Font
     style: Italic
 
   bold_italic:
-    family: Inconsolata
+    family: Inconsolata Nerd Font
     style: Bold Italic
 
-  size: 9
+  size: 12
