@@ -63,18 +63,6 @@ bindsym Print exec maim -s ~/screenshots/$(date "+%Y-%m-%d:%s").png
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
-# change focus
-bindsym $mod+h focus left
-bindsym $mod+j focus down
-bindsym $mod+k focus up
-bindsym $mod+l focus right
-
-# move focused window
-bindsym $mod+Shift+h move left
-bindsym $mod+Shift+j move down
-bindsym $mod+Shift+k move up
-bindsym $mod+Shift+l move right
-
 
 ########################################################################################
 # => Workspace Setup
@@ -149,6 +137,29 @@ mode "resize" {
 }
 
 bindsym $mod+r mode "resize"
+
+
+########################################################################################
+# => Focus Mode
+########################################################################################
+
+mode "focus" {
+        bindsym h focus left
+        bindsym j focus down
+        bindsym k focus up
+        bindsym l focus right
+
+        bindsym Control+h move left
+        bindsym Control+j move down
+        bindsym Control+k move up
+        bindsym Control+l move right
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+o mode "default"
+}
+
+bindsym $mod+o mode "focus"
 
 
 ########################################################################################
