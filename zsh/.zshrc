@@ -116,9 +116,14 @@ alias ...='cd ../../..'
 alias CD='cd ~/open_source/CodingDojo'
 alias MCC='cd ~/projects/midday_coding_challenges'
 alias CW='cd ~/projects/code_wars'
+alias ls='exa -l'
+alias lsa='exa -la'
 
 # Disable CTRL-S default behavior (freeze the terminal)
 stty -ixon
 
 # Created by `pipx` on 2021-06-15 02:08:36
 export PATH="$PATH:/home/eric/.local/bin"
+
+eval "$(direnv hook zsh)"  # Hook direnv into shell
+

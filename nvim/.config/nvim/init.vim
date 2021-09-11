@@ -98,8 +98,12 @@ autocmd FileType typescript     setlocal shiftwidth=2 tabstop=2     expandtab
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 call plug#begin('~/.local/share/nvim/plugged')
+    Plug 'nvim-lua/popup.nvim'              " Dependency
+    Plug 'nvim-lua/plenary.nvim'            " Dependency
+
     Plug 'jiangmiao/auto-pairs'             " Auto Bracket Pairs
     Plug 'windwp/nvim-ts-autotag'           " Auto closing tags
+    Plug 'tpope/vim-fugitive'               " Git client/integration
     Plug 'itchyny/lightline.vim'            " Lightline
     Plug 'josa42/nvim-lightline-lsp'        " Lightline LSP Integration
     Plug 'neovim/nvim-lspconfig'            " LSP Common Configurations
@@ -111,8 +115,6 @@ call plug#begin('~/.local/share/nvim/plugged')
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " Treesitter
     Plug 'nvim-treesitter/completion-treesitter'    " Treesitter code completion source
     Plug 'altercation/vim-colors-solarized' " Solarized color scheme
-    Plug 'nvim-lua/popup.nvim'              " Telescope dependency
-    Plug 'nvim-lua/plenary.nvim'            " Telescope dependency
     Plug 'nvim-telescope/telescope.nvim'    " Telescope fuzzy finder
 call plug#end()
 
@@ -158,12 +160,8 @@ let g:lightline#lsp#indicator_infos = "ℹ"
 let g:lightline#lsp#indicator_warnings = "⚠"
 let g:lightline#lsp#indicator_errors = "✘"
 let g:lightline#lsp#indicator_ok = "✔"
-let g:lightline.separator = {
-    \   'left': '', 'right': ''
-\}
-let g:lightline.subseparator = {
-    \   'left': '', 'right': ''
-\}
+let g:lightline.separator = { 'left': '', 'right': '' }
+let g:lightline.subseparator = { 'left': '', 'right': '' }
 function! LightlineFilename()
   return expand('%:t') !=# '' ? @% : '[No Name]'
 endfunction
@@ -190,12 +188,16 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 
 lua << EOF
 local nvim_lsp = require'lspconfig'
+local on_attach = require'completion'.on_attach
 
 -- Vue LSP Setup
-nvim_lsp.vuels.setup{on_attach=require'completion'.on_attach}
+nvim_lsp.vuels.setup{on_attach=on_attach}
+
+-- Python LSP Setup
+nvim_lsp.pyright.setup{on_attach=on_attach}
 
 -- Rust LSP Setup
-nvim_lsp.rust_analyzer.setup{on_attach=require'completion'.on_attach}
+nvim_lsp.rust_analyzer.setup{on_attach=on_attach}
 local opts = {
     tools = { 
         autoSetHints = true,
@@ -250,3 +252,5 @@ require'nvim-treesitter.configs'.setup {
 }
 
 EOF
+
+

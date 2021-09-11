@@ -30,7 +30,7 @@ colors:
 # Font
 font:
   normal:
-    family: Inconsolata Nerd Font
+    family: Inconsolata
     style: Regular
 
   bold:
@@ -46,3 +46,6 @@ font:
     style: Bold Italic
 
   size: 12
+
+# Opacity
+background_opacity: 0.90
