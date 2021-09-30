@@ -1,0 +1,110 @@
+#!/bin/bash
+
+#-------------------------------------------------------------------------------------- 
+# Conversion map - CHAR_MORSE_MAP contains one line per combination of alphanumeric
+#                  character and morse code representation. Used for searching and
+#                  replacing for both encoding and decoding.
+#-------------------------------------------------------------------------------------- 
+
+CHAR_MORSE="A:.- B:-... C:-.-. D:-.. E:. F:..-. G:--. H:.... I:.. J:.--- K:-.-
+            L:.-.. M:-- N:-. O:--- P:.--. Q:--.- R:.-. S:... T:- U:..- V:...-
+            W:.-- X:-..- Y:-.-- Z:--.. 0:----- 1:.---- 2:..--- 3:...-- 4:....-
+            5:..... 6:-.... 7:--... 8:---.. 9:----." 
+CHAR_MORSE_MAP=$(echo $CHAR_MORSE | tr ' ' '\n')
+
+
+#-------------------------------------------------------------------------------------- 
+# Encode - Takes an alphanumeric string as an argument and echoes a whitespace-encoded
+#          string. Will error and exit if the argument contains non-alphanumeric 
+#          characters. All lowercase letters are converted to uppercase letters.
+#-------------------------------------------------------------------------------------- 
+
+encode() {
+    # Exit if non-alphanumeric characters are found
+    [[ "$1" =~ "[^a-zA-Z0-9 ]" ]] && echo "Can only encode alphanumeric characters" && exit 1
+
+    # Uppercase the input, replace all spaces with newlines, add spaces between letters
+    INPUT=$(echo ${1^^} | tr ' ' '\n' | sed 's/\([[:alnum:]]\)/\1 /g')
+    MORSE_OUTPUT=""     # For holding output
+    
+    IFS=$'\n'   # Separate by newline
+    for word in $INPUT; do
+        IFS=' ' # Separate by space
+        for char in $word; do
+            # Find the line containing the letter or number and set MORSE to the
+            # morse code portion of that line
+            MORSE=$(echo $CHAR_MORSE_MAP | grep $char | cut -c 3-)
+
+            # Append the morse code representation and a letter separator '|' to output
+            MORSE_OUTPUT+="$MORSE|"
+        done
+        MORSE_OUTPUT+="\n"
+    done
+    unset IFS
+
+    # Echo MORSE_OUTPUT, substituting '\v' for '|', ' ' for '.', and '\t' for '-'
+    echo -e $MORSE_OUTPUT | tr '|.-' '\v \t' 
+    exit 0
+}
+
+
+#-------------------------------------------------------------------------------------- 
+# Decode - Takes a whitespace-encoded string as an argument and echoes the original
+#          alphanumeric string to stdout. Take care to quote arguments when decoding,
+#          as otherwise Bash will strip whitespace.
+#-------------------------------------------------------------------------------------- 
+
+decode() {
+    # Replace '\v' with ' ', ' ' with '.', and '\t' with '-' in the input
+    INPUT=$(echo "$1" | tr '\v \t' ' .-')
+    ALPHANUMERIC_OUTPUT=""      # For holding output
+
+    IFS=$'\n'   # Separate by newline
+    for word in $INPUT; do
+        IFS=' ' # Separate by space
+        for morse in $word; do
+            # Need to escape the periods in the input, since otherwise they would match
+            # any character regex-style
+            ESCAPED_DOTS=$(echo $morse | sed 's/\./\\./g')
+
+            # Search for the morse sequence starting with the colon and ending at the
+            # end of the line. This way, "--" doesn't match ".--" or "---".
+            SEARCH_STRING=":$ESCAPED_DOTS$"
+
+            # Find the line in CHAR_MORSE_MAP that matches SEARCH_STRING and take the
+            # first character from that line as the alphanumeric representation
+            ALPHANUM=$(echo $CHAR_MORSE_MAP | grep $SEARCH_STRING | cut -c -1)
+            ALPHANUMERIC_OUTPUT+="$ALPHANUM"   # Append letter/number to output
+        done
+        ALPHANUMERIC_OUTPUT+="\n"
+    done
+    unset IFS
+    
+    # Echo the output, replacing newlines with spaces
+    echo -e $ALPHANUMERIC_OUTPUT | tr '\n' ' ' | xargs
+    exit 0
+}
+
+
+#-------------------------------------------------------------------------------------- 
+# Check for input, and use the -e and -d flags to indicate whether to encode or decode
+#-------------------------------------------------------------------------------------- 
+
+while getopts e:d: flag; do
+    case "${flag}" in
+        e) encode "${OPTARG}";;
+        d) decode "${OPTARG}";;
+    esac
+done
+
+echo -e "Steganography"
+echo -e "\tEncode and decode alphanumeric strings to whitespace and back."
+echo -e "\tUse it to play silly tricks! Only accepts letters, numbers, and spaces."
+echo -e ""
+echo -e "Usage"
+echo -e "\tstego -e \"HELLO WORLD\" > encrypted.txt"
+echo -e "\tstego -d \"\$(cat encrypted.txt)\""
+echo -e ""
+echo -e "Options"
+echo -e "\t-e\tEncode a text string"
+echo -e "\t-d\tDecode a whitespace string"

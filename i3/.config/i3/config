@@ -21,6 +21,7 @@ floating_modifier $mod
 # xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
 # screen before suspend. Use loginctl lock-session to lock your screen.
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+bindsym Mod4+l exec "i3lock --image ~/img/wallpapers/orbit-1920x1080-solarized.png --tiling -c 000000"
 
 exec --no-startup-id nm-applet
 exec --no-startup-id xmodmap ~/.xmodmaprc
@@ -106,7 +107,7 @@ bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # Launch applications in workspaces
-exec --no-startup-id i3-msg 'workspace 1:tmux; exec /home/eric/.cargo/bin/alacritty'
+exec --no-startup-id i3-msg 'workspace 1:tmux; exec /home/eric/.cargo/bin/alacritty; exec tmux'
 exec --no-startup-id i3-msg 'workspace 3:web; exec /usr/bin/firefox'
 
 # Assign windows to workspaces

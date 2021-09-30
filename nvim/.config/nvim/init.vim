@@ -83,7 +83,7 @@ set autoindent		" Use current indent on new lines
 set smartindent		" Smart autoindenting for new line
 set completeopt=menuone,noinsert,noselect
 
-" Override for specific file types
+" >> Override for specific file types
 autocmd FileType yaml           setlocal shiftwidth=2 softtabstop=2 expandtab
 autocmd FileType ruby           setlocal shiftwidth=2 tabstop=2     expandtab
 autocmd FileType eruby          setlocal shiftwidth=2 tabstop=2     expandtab
@@ -92,6 +92,10 @@ autocmd FileType html           setlocal shiftwidth=2 tabstop=2     expandtab
 autocmd FileType javascript     setlocal shiftwidth=2 tabstop=2     expandtab
 autocmd FileType typescript     setlocal shiftwidth=2 tabstop=2     expandtab
 
+" >> Vim SLIME <<
+let g:slime_target = "tmux"
+let g:slime_paste_file = "$HOME/.config/nvim/.slime_paste"
+let g:slime_default_config = {"socket_name": "default", "target_pane": "{last}"}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
@@ -116,6 +120,7 @@ call plug#begin('~/.local/share/nvim/plugged')
     Plug 'nvim-treesitter/completion-treesitter'    " Treesitter code completion source
     Plug 'altercation/vim-colors-solarized' " Solarized color scheme
     Plug 'nvim-telescope/telescope.nvim'    " Telescope fuzzy finder
+    Plug 'jpalardy/vim-slime'               " Vim SLIME -> Send text to REPL
 call plug#end()
 
 
@@ -195,6 +200,9 @@ nvim_lsp.vuels.setup{on_attach=on_attach}
 
 -- Python LSP Setup
 nvim_lsp.pyright.setup{on_attach=on_attach}
+
+-- R LSP Setup
+nvim_lsp.r_language_server.setup{on_attach=on_attach}
 
 -- Rust LSP Setup
 nvim_lsp.rust_analyzer.setup{on_attach=on_attach}
