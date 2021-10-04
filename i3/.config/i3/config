@@ -23,8 +23,9 @@ floating_modifier $mod
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 bindsym Mod4+l exec "i3lock --image ~/img/wallpapers/orbit-1920x1080-solarized.png --tiling -c 000000"
 
-exec --no-startup-id nm-applet
+exec --no-startup-id command -v nm-appliet && nm-applet
 exec --no-startup-id xmodmap ~/.xmodmaprc
+exec --no-startup-id command -v gromit-mpx && gromit-mpx
 exec_always --no-startup-id picom &             
 exec_always --no-startup-id nitrogen --restore
  
