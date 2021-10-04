@@ -13,6 +13,7 @@ export ZSH="/home/eric/.oh-my-zsh"
 export PATH="$PATH:/home/eric/.local/bin"
 export VISUAL=nvim
 export EDITOR=nvim
+export XDG_CONFIG_HOME=~/.config
 
 ########################################################################################
 # => Theming
