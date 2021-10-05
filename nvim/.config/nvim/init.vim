@@ -71,6 +71,7 @@ set showmatch		" Show matching brackets
 set updatetime=600	" Write swapfile to disk after 600 ms no typing
 set path+=**        " Searches current directory recursively
 set noswapfile      " Disable swap files
+set autoread        " Reload files changed outside of Vim
 
 " >> Tabs and Indenting <<
 set expandtab		" Replace tabs with spaces
@@ -186,6 +187,10 @@ hi LspDiagnosticsVirtualTextHint guifg=green gui=bold,italic,underline ctermfg=1
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() |
     \ quit | endif
 
+" Run rustfmt when saving Rust files
+autocmd BufWritePost *.rs silent! ! rustfmt % 
+autocmd BufWritePost *.rs edit
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => LSP Setup
@@ -205,7 +210,6 @@ nvim_lsp.pyright.setup{on_attach=on_attach}
 nvim_lsp.r_language_server.setup{on_attach=on_attach}
 
 -- Rust LSP Setup
-nvim_lsp.rust_analyzer.setup{on_attach=on_attach}
 local opts = {
     tools = { 
         autoSetHints = true,
@@ -214,15 +218,14 @@ local opts = {
         debuggables = { use_telescope = true },
         inlay_hints = {
             only_current_line = false,
-            only_current_line_autocmd = "CursorHold",
             show_parameter_hints = true,
             parameter_hints_prefix = "<- ",
             other_hints_prefix = "=> ",
-            max_len_align = false,
-            max_len_align_padding = 1,
+            max_len_align = true,
+            max_len_align_padding = 2,
             right_align = false,
             right_align_padding = 7,
-            highlight = "Comment",
+            highlight = "LspDiagnosticsVirtualTextHint",
         },
         hover_actions = {
             border = {
@@ -239,7 +242,16 @@ local opts = {
             full = true,
         }
     },
-    server = {} -- rust-analyzer options
+    server = {
+        on_attach = on_attach,
+        settings = {
+            ["rust-analyzer"] = {
+                checkOnSave = {
+                    command = "clippy"
+                },
+            }
+        }
+    }, -- rust-analyzer options
 }
 
 require('rust-tools').setup(opts)
