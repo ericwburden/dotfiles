@@ -84,5 +84,6 @@ alias lla='exa -la'
 # Disable CTRL-S default behavior (freeze the terminal)
 stty -ixon
 
-eval "$(direnv hook zsh)"  # Hook direnv into shell
+eval "$(direnv hook zsh)"   # Hook direnv into shell
+eval "$(starship init zsh)" # Initialize Starship prompt
 

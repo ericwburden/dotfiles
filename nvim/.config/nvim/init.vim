@@ -33,6 +33,7 @@ nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 " >> Rust Tools Keybindings <<
 nnoremap <leader>rr :RustRunnables<CR>
 nnoremap <leader>rt :RustToggleInlayHints<CR>
+nnoremap <leader>rd :RustDebuggables<CR>
 
 " >> LSP bindings <<
 " Use <Tab> and <S-Tab> to navigate through popup menu
@@ -52,6 +53,9 @@ nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
 nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
 nnoremap <silent> g[    <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
 nnoremap <silent> g]    <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+
+" >> Workflow Keybindings <<
+nnoremap <leader>ct     :! cargo test -- --nocapture<CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -82,7 +86,10 @@ set linebreak		" Break at specified character
 set textwidth=500	" Maximum width of inserted text
 set autoindent		" Use current indent on new lines
 set smartindent		" Smart autoindenting for new line
+
+" >> Completion <<
 set completeopt=menuone,noinsert,noselect
+set omnifunc=v:lua.vim.lsp.omnifunc
 
 " >> Override for specific file types
 autocmd FileType yaml           setlocal shiftwidth=2 softtabstop=2 expandtab
@@ -98,6 +105,7 @@ let g:slime_target = "tmux"
 let g:slime_paste_file = "$HOME/.config/nvim/.slime_paste"
 let g:slime_default_config = {"socket_name": "default", "target_pane": "{last}"}
 
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -105,23 +113,33 @@ let g:slime_default_config = {"socket_name": "default", "target_pane": "{last}"}
 call plug#begin('~/.local/share/nvim/plugged')
     Plug 'nvim-lua/popup.nvim'              " Dependency
     Plug 'nvim-lua/plenary.nvim'            " Dependency
+    
+    Plug 'itchyny/lightline.vim'            " Lightline
+    Plug 'josa42/nvim-lightline-lsp'        " Lightline LSP Integration
+    Plug 'altercation/vim-colors-solarized' " Solarized color scheme
 
     Plug 'jiangmiao/auto-pairs'             " Auto Bracket Pairs
     Plug 'windwp/nvim-ts-autotag'           " Auto closing tags
+    Plug 'tpope/vim-commentary'             " Code Commenting Hotkeys
+
+    Plug 'hrsh7th/nvim-cmp'                 " Code Completion
+    Plug 'hrsh7th/cmp-nvim-lsp'             " Completion Source: LSP
+    Plug 'hrsh7th/cmp-buffer'               " Completion Source: Buffer
+    Plug 'hrsh7th/cmp-vsnip'                " Completion Source: vsnip
+    Plug 'hrsh7th/vim-vsnip'                " Completion Source: vsnip
+
     Plug 'tpope/vim-fugitive'               " Git client/integration
-    Plug 'itchyny/lightline.vim'            " Lightline
-    Plug 'josa42/nvim-lightline-lsp'        " Lightline LSP Integration
+    Plug 'nvim-telescope/telescope.nvim'    " Telescope fuzzy finder
+    Plug 'jpalardy/vim-slime'               " Vim SLIME -> Send text to REPL
+    Plug 'mechatroner/rainbow_csv'          " Rainbow CSV
+    
     Plug 'neovim/nvim-lspconfig'            " LSP Common Configurations
-    Plug 'nvim-lua/completion-nvim'         " LSP Code Completion
     Plug 'simrat39/rust-tools.nvim'         " LSP Extra Rust Tools
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " Treesitter
+
     Plug 'preservim/nerdtree'               " NERDTree file explorer
     Plug 'Xuyuanp/nerdtree-git-plugin'      " NERDTree Git icons
     Plug 'ryanoasis/vim-devicons'           " NERDTree File type icons
-    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " Treesitter
-    Plug 'nvim-treesitter/completion-treesitter'    " Treesitter code completion source
-    Plug 'altercation/vim-colors-solarized' " Solarized color scheme
-    Plug 'nvim-telescope/telescope.nvim'    " Telescope fuzzy finder
-    Plug 'jpalardy/vim-slime'               " Vim SLIME -> Send text to REPL
 call plug#end()
 
 
@@ -172,7 +190,7 @@ function! LightlineFilename()
   return expand('%:t') !=# '' ? @% : '[No Name]'
 endfunction
 
-" >> Additional Error Colors <<
+" >> Additional Colors <<
 hi LspDiagnosticsVirtualTextError guifg=red gui=bold,italic,underline ctermfg=167:
 hi LspDiagnosticsVirtualTextWarning guifg=orange gui=bold,italic,underline ctermfg=179
 hi LspDiagnosticsVirtualTextInformation guifg=yellow gui=bold,italic,underline ctermfg=195
@@ -187,74 +205,78 @@ hi LspDiagnosticsVirtualTextHint guifg=green gui=bold,italic,underline ctermfg=1
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() |
     \ quit | endif
 
-" Run rustfmt when saving Rust files
-autocmd BufWritePost *.rs silent! ! rustfmt % 
-autocmd BufWritePost *.rs edit
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => LSP Setup
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 lua << EOF
+local cmp = require'cmp'
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local nvim_lsp = require'lspconfig'
-local on_attach = require'completion'.on_attach
+
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      vim.fn["vsnip#anonymous"](args.body)
+    end,
+  },
+  mapping = {
+    ['<C-n>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+    ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+    ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+    ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.close(),
+    ['<CR>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' },
+    { name = 'buffer' },
+  }
+})
 
 -- Vue LSP Setup
-nvim_lsp.vuels.setup{on_attach=on_attach}
+nvim_lsp.vuels.setup{}
 
 -- Python LSP Setup
-nvim_lsp.pyright.setup{on_attach=on_attach}
+nvim_lsp.pyright.setup{}
 
 -- R LSP Setup
-nvim_lsp.r_language_server.setup{on_attach=on_attach}
+nvim_lsp.r_language_server.setup{}
+
+-- Elm LSP Setup
+nvim_lsp.elmls.setup{}
 
 -- Rust LSP Setup
-local opts = {
-    tools = { 
+local rust_opts = {
+    tools = { -- rust-tools options
         autoSetHints = true,
         hover_with_actions = true,
-        runnables = { use_telescope = true },
-        debuggables = { use_telescope = true },
         inlay_hints = {
-            only_current_line = false,
-            show_parameter_hints = true,
-            parameter_hints_prefix = "<- ",
-            other_hints_prefix = "=> ",
+            show_parameter_hints = false,
+            parameter_hints_prefix = "",
+            other_hints_prefix = " =>",
             max_len_align = true,
-            max_len_align_padding = 2,
-            right_align = false,
-            right_align_padding = 7,
-            highlight = "LspDiagnosticsVirtualTextHint",
+            max_len_align_padding = 5,
         },
-        hover_actions = {
-            border = {
-                {"╭", "FloatBorder"}, {"─", "FloatBorder"},
-                {"╮", "FloatBorder"}, {"│", "FloatBorder"},
-                {"╯", "FloatBorder"}, {"─", "FloatBorder"},
-                {"╰", "FloatBorder"}, {"│", "FloatBorder"}
-            },
-            auto_focus = false
-        },
-        crate_graph = {
-            backend = "x11",
-            output = nil, -- Relative path from wd, nil for no storage
-            full = true,
-        }
     },
     server = {
-        on_attach = on_attach,
         settings = {
             ["rust-analyzer"] = {
-                checkOnSave = {
-                    command = "clippy"
-                },
+                capabilities = capabilities,
+                checkOnSave = { command = "clippy" },
+                cargo = { loadOutDirsFromCheck = true, },
+                procMacro = { enable = true },
             }
         }
-    }, -- rust-analyzer options
+    },
 }
 
-require('rust-tools').setup(opts)
+require('rust-tools').setup(rust_opts)
 
 EOF
 
@@ -262,6 +284,7 @@ EOF
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Treesitter setup
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 lua <<EOF
 
 require'nvim-treesitter.configs'.setup {

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+xrandr --listactivemonitors
+
+echo ""
+read -p 'Which monitor do you want to draw on?: ' monitor
+
+devices=$(xsetwacom --list devices | awk '{print $9}')
+
+for device in $devices; do
+    xsetwacom --set "$device" MapToOutput "HEAD-$monitor"
+done
