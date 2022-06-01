@@ -23,12 +23,16 @@ floating_modifier $mod
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 bindsym Mod4+l exec "i3lock --image ~/img/wallpapers/orbit-1920x1080-solarized.png --tiling -c 000000"
 
-exec --no-startup-id command -v nm-appliet && nm-applet
-exec --no-startup-id xmodmap ~/.xmodmaprc
+# Startup programs
+exec --no-startup-id command -v nm-applet && nm-applet
+exec --no-startup-id command -v xmodmap && xmodmap ~/.xmodmaprc
 exec --no-startup-id command -v gromit-mpx && gromit-mpx
+exec --no-startup-id command -v flameshot && flameshot
+
 exec_always --no-startup-id picom &             
 exec_always --no-startup-id nitrogen --restore
- 
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
@@ -38,10 +42,20 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 
 
 ########################################################################################
+# => Gaps
+########################################################################################
+
+gaps inner 4
+gaps outer 0
+smart_gaps on
+smart_borders on
+
+
+########################################################################################
 # => Key Bindings
 ########################################################################################
 
-bindsym $mod+Return exec /home/eric/.cargo/bin/alacritty
+bindsym $mod+Return exec alacritty
 bindsym $mod+Shift+q kill
 bindsym $mod+d exec "rofi -modi drun,run -show drun"
 bindsym $mod+Control+h split h
@@ -76,7 +90,7 @@ bindsym $mod+Shift+x exec "rm ~/.config/i3/config"
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
 set $ws1 "1:tmux"
-set $ws2 "2:r"
+set $ws2 "2:code"
 set $ws3 "3:web"
 set $ws4 "4:file"
 set $ws5 "5"
@@ -111,17 +125,20 @@ bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # Launch applications in workspaces
-exec --no-startup-id i3-msg 'workspace 1:tmux; exec /home/eric/.cargo/bin/alacritty; exec tmux'
-exec --no-startup-id i3-msg 'workspace 3:web; exec /usr/bin/firefox'
+exec --no-startup-id i3-msg 'workspace 1:tmux; exec alacritty; exec tmux'
+exec --no-startup-id i3-msg 'workspace 3:web; exec /usr/bin/vivaldi-stable'
 
 # Assign windows to workspaces
-assign [class="Alacritty"] $ws1
-assign [class="rstudio"] $ws2
-assign [class="Firefox"] $ws3
-assign [class="Thunar"] $ws4
-assign [class="App"] $ws5
-assign [class="xfce4-taskmanager"] $ws9
-assign [class="Slack"] $ws10
+assign [class="Alacritty"]          $ws1
+assign [class="rstudio"]            $ws2
+assign [class="code"]               $ws2
+assign [class="Vivaldi"]            $ws3
+assign [class="Thunar"]             $ws4
+assign [class="pcmanfm"]            $ws4
+assign [class="App"]                $ws5
+assign [class="xfce4-taskmanager"]  $ws9
+assign [class="htop"]               $ws9
+assign [class="Slack"]              $ws10
 
 
 ########################################################################################
@@ -186,18 +203,19 @@ hide_edge_borders smart
 # => Status Bar
 ########################################################################################
 
-bar {
-    font pango:Inconsolata 10
-    position top
-    tray_output primary
-    strip_workspace_numbers yes
-    status_command ~/.local/bin/bumblebee-status/bumblebee-status -m xrandr nic disk:root \
-        cpu load memory battery datetime pasink dnf \
-        -p root.path=/ datetime.format="%m/%d | %I:%M %p" nic.format="{state} {ssid}" \
-           disk.format="{percent:04.01f}% | {size}" memory.format="{percent:04.01f}% | {total}" \
-        -t solarized-powerline
-    colors {
-        background #073642
-    }
-}
+# bar {
+#     font pango:Inconsolata 10
+#     position top
+#     tray_output DP-2
+#     separator_symbol "  "
+#     strip_workspace_numbers yes
+#     status_command bumblebee-status -m xrandr nic disk:root \
+#         cpu load memory battery datetime pasink pacman \
+#         -p root.path=/ datetime.format="%m/%d | %I:%M %p" nic.format="{state} {ssid}" \
+#            disk.format="{percent:04.01f}% | {size}" memory.format="{percent:04.01f}% | {total}" \
+#         -t solarized-powerline
+#     colors {
+#         background #073642
+#     }
+# }
 

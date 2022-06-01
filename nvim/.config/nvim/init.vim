@@ -59,6 +59,13 @@ nnoremap <leader>ct     :! cargo test -- --nocapture<CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Abbreviations
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+cabbr <expr> %% expand('%:p:h')
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -99,11 +106,16 @@ autocmd FileType vue            setlocal shiftwidth=2 tabstop=2     expandtab
 autocmd FileType html           setlocal shiftwidth=2 tabstop=2     expandtab
 autocmd FileType javascript     setlocal shiftwidth=2 tabstop=2     expandtab
 autocmd FileType typescript     setlocal shiftwidth=2 tabstop=2     expandtab
+autocmd FileType r              setlocal shiftwidth=2 tabstop=2     expandtab
 
 " >> Vim SLIME <<
 let g:slime_target = "tmux"
 let g:slime_paste_file = "$HOME/.config/nvim/.slime_paste"
 let g:slime_default_config = {"socket_name": "default", "target_pane": "{last}"}
+
+" >> Markdown Preview <<
+let g:mkdp_browser = 'lynx'
+let g:mkdp_echo_preview_url = 1
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -117,6 +129,7 @@ call plug#begin('~/.local/share/nvim/plugged')
     Plug 'itchyny/lightline.vim'            " Lightline
     Plug 'josa42/nvim-lightline-lsp'        " Lightline LSP Integration
     Plug 'altercation/vim-colors-solarized' " Solarized color scheme
+    Plug 'shaunsingh/nord.nvim'             " Nord color scheme
 
     Plug 'jiangmiao/auto-pairs'             " Auto Bracket Pairs
     Plug 'windwp/nvim-ts-autotag'           " Auto closing tags
@@ -127,6 +140,7 @@ call plug#begin('~/.local/share/nvim/plugged')
     Plug 'hrsh7th/cmp-buffer'               " Completion Source: Buffer
     Plug 'hrsh7th/cmp-vsnip'                " Completion Source: vsnip
     Plug 'hrsh7th/vim-vsnip'                " Completion Source: vsnip
+    Plug 'jose-elias-alvarez/null-ls.nvim'  " Extra LSP Config
 
     Plug 'tpope/vim-fugitive'               " Git client/integration
     Plug 'nvim-telescope/telescope.nvim'    " Telescope fuzzy finder
@@ -136,10 +150,14 @@ call plug#begin('~/.local/share/nvim/plugged')
     Plug 'neovim/nvim-lspconfig'            " LSP Common Configurations
     Plug 'simrat39/rust-tools.nvim'         " LSP Extra Rust Tools
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " Treesitter
+    Plug 'jose-elias-alvarez/nvim-lsp-ts-utils' " TS LSP Goodies
 
     Plug 'preservim/nerdtree'               " NERDTree file explorer
     Plug 'Xuyuanp/nerdtree-git-plugin'      " NERDTree Git icons
     Plug 'ryanoasis/vim-devicons'           " NERDTree File type icons
+
+    " Markdown Preview
+    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 call plug#end()
 
 
@@ -148,7 +166,7 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 syntax enable           " Enable syntax highlighting
-colorscheme solarized   " Use solarized color scheme
+"colorscheme nord        " Use solarized color scheme
 
 let g:lightline = {
     \ 'colorscheme': 'solarized',
@@ -214,6 +232,7 @@ lua << EOF
 local cmp = require'cmp'
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local nvim_lsp = require'lspconfig'
+local null_ls = require("null-ls")
 
 cmp.setup({
   snippet = {
@@ -239,6 +258,49 @@ cmp.setup({
   }
 })
 
+local buf_map = function(bufnr, mode, lhs, rhs, opts)
+    vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
+        silent = true,
+    })
+end
+
+local on_attach = function(client, bufnr)
+    vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
+    vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
+    vim.cmd("command! LspCodeAction lua vim.lsp.buf.code_action()")
+    vim.cmd("command! LspHover lua vim.lsp.buf.hover()")
+    vim.cmd("command! LspRename lua vim.lsp.buf.rename()")
+    vim.cmd("command! LspRefs lua vim.lsp.buf.references()")
+    vim.cmd("command! LspTypeDef lua vim.lsp.buf.type_definition()")
+    vim.cmd("command! LspImplementation lua vim.lsp.buf.implementation()")
+    vim.cmd("command! LspDiagPrev lua vim.diagnostic.goto_prev()")
+    vim.cmd("command! LspDiagNext lua vim.diagnostic.goto_next()")
+    vim.cmd("command! LspDiagLine lua vim.diagnostic.open_float()")
+    vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
+    buf_map(bufnr, "n", "gd", ":LspDef<CR>")
+    buf_map(bufnr, "n", "gr", ":LspRename<CR>")
+    buf_map(bufnr, "n", "gy", ":LspTypeDef<CR>")
+    buf_map(bufnr, "n", "K", ":LspHover<CR>")
+    buf_map(bufnr, "n", "[a", ":LspDiagPrev<CR>")
+    buf_map(bufnr, "n", "]a", ":LspDiagNext<CR>")
+    buf_map(bufnr, "n", "ga", ":LspCodeAction<CR>")
+    buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
+    buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
+    if client.resolved_capabilities.document_formatting then
+        vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")
+    end
+end
+
+null_ls.setup({
+    sources = {
+        -- Use ESLint and Prettier in TS files
+        null_ls.builtins.diagnostics.eslint,
+        null_ls.builtins.code_actions.eslint,
+        null_ls.builtins.formatting.prettier
+    },
+    on_attach = on_attach
+})
+
 -- Vue LSP Setup
 nvim_lsp.vuels.setup{}
 
@@ -250,6 +312,24 @@ nvim_lsp.r_language_server.setup{}
 
 -- Elm LSP Setup
 nvim_lsp.elmls.setup{}
+
+-- Julia LSP Setup
+nvim_lsp.julials.setup{}
+
+-- TypeScript LSP Setup
+nvim_lsp.tsserver.setup({
+    on_attach = function(client, bufnr)
+        client.resolved_capabilities.document_formatting = false
+        client.resolved_capabilities.document_range_formatting = false
+        local ts_utils = require("nvim-lsp-ts-utils")
+        ts_utils.setup({})
+        ts_utils.setup_client(client)
+        buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
+        buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
+        buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
+        on_attach(client, bufnr)
+    end,
+})
 
 -- Rust LSP Setup
 local rust_opts = {
