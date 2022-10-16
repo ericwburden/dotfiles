@@ -1,6 +1,0 @@
-    result <- tryCatch(expect_setequal(possible_answer, answer), error = \(e) e)
-    if ("error" %in% class(result)) {
-      error <- result 
-      next
-    }
-    return(TRUE)
