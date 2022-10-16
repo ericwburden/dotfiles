@@ -84,19 +84,19 @@ colors: *nord
 # Font
 font:
   normal:
-    family: LiterationMono Nerd Font
+    family: LiterationMono Nerd Font Complete
     style: Regular
 
   bold:
-    family: LiterationMono Nerd Font
+    family: LiterationMono Nerd Font Complete
     style: Bold
 
   italic:
-    family: LiterationMono Nerd Font
+    family: LiterationMono Nerd Font Complete
     style: Italic
 
   bold_italic:
-    family: LiterationMono Nerd Font
+    family: LiterationMono Nerd Font Complete
     style: Bold Italic
 
   size: 11
