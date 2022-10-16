@@ -9,7 +9,7 @@
 # => Environment Variables
 ########################################################################################
 
-export ZSH="/home/ericb/.oh-my-zsh"
+export ZSH="/home/eric/.oh-my-zsh"
 export PATH="$PATH:~/.local/bin:~/.npm-global/bin:~/.local/share/gem/ruby/3.0.0/bin"
 export VISUAL=nvim
 export EDITOR=nvim
@@ -88,8 +88,10 @@ stty -ixon
 eval "$(direnv hook zsh)"   # Hook direnv into shell
 eval "$(starship init zsh)" # Initialize Starship prompt
 
-source /home/ericb/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /home/eric/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # tabtab source for electron-forge package
 # uninstall by removing these lines or running `tabtab uninstall electron-forge`
-[[ -f /home/ericb/.cache/paru/clone/scratchjr-desktop-git/src/ScratchJr-Desktop/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /home/ericb/.cache/paru/clone/scratchjr-desktop-git/src/ScratchJr-Desktop/node_modules/tabtab/.completions/electron-forge.zsh
+[[ -f /home/eric/.cache/paru/clone/scratchjr-desktop-git/src/ScratchJr-Desktop/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /home/eric/.cache/paru/clone/scratchjr-desktop-git/src/ScratchJr-Desktop/node_modules/tabtab/.completions/electron-forge.zsh
+
+tmux source ~/.config/tmux/tmux.conf
