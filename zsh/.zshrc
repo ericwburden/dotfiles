@@ -88,10 +88,4 @@ stty -ixon
 eval "$(direnv hook zsh)"   # Hook direnv into shell
 eval "$(starship init zsh)" # Initialize Starship prompt
 
-source /home/eric/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# tabtab source for electron-forge package
-# uninstall by removing these lines or running `tabtab uninstall electron-forge`
-[[ -f /home/eric/.cache/paru/clone/scratchjr-desktop-git/src/ScratchJr-Desktop/node_modules/tabtab/.completions/electron-forge.zsh ]] && . /home/eric/.cache/paru/clone/scratchjr-desktop-git/src/ScratchJr-Desktop/node_modules/tabtab/.completions/electron-forge.zsh
-
 tmux source ~/.config/tmux/tmux.conf
