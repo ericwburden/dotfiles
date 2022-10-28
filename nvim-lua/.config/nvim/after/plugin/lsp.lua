@@ -1,3 +1,5 @@
+local lspconfig = require('lspconfig')
+
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local buf_map = function(bufnr, mode, lhs, rhs, opts)
@@ -68,3 +70,11 @@ require('rust-tools').setup({
         }
     },
 })
+
+
+---------------------------------------------------------------------------------------
+-- R LSP Settings ---------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+lspconfig.r_language_server.setup({on_attach = on_attach})
+
