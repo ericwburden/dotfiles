@@ -10,7 +10,7 @@
 ########################################################################################
 
 export ZSH="/home/eric/.oh-my-zsh"
-export PATH="$PATH:~/.local/bin:~/.npm-global/bin:~/.local/share/gem/ruby/3.0.0/bin"
+export PATH="$PATH:$HOME/.local/bin:$HOME/.npm-global/bin:$HOME/.local/share/gem/ruby/3.0.0/bin"
 export VISUAL=nvim
 export EDITOR=nvim
 export XDG_CONFIG_HOME=~/.config
