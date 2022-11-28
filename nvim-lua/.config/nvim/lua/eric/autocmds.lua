@@ -11,7 +11,7 @@ if vim.fn.has "nvim-0.7" then
   -- Exit certain windows with "q"
   local exitWithQ = api.nvim_create_augroup("ExitWindowsWithQ", { clear = true })
   api.nvim_create_autocmd("FileType", {
-    pattern = { "help", "startuptime", "qf", "lspinfo" },
+    pattern = { "help", "startuptime", "qf", "lspinfo", "nerdtree" },
     command = [[nnoremap <buffer><silent> q :close<CR>]],
     group = exitWithQ,
   })
@@ -21,19 +21,40 @@ if vim.fn.has "nvim-0.7" then
     group = exitWithQ,
   })
 
-  -- Set Python tabwidth to 4
-  local pythonIndentFix = api.nvim_create_augroup("PythonIndentByFour", { clear = true })
+  -- Set Python and Rust tabwidth to 4
+  local indentByFour = api.nvim_create_augroup("indentByFour", { clear = true })
   api.nvim_create_autocmd("FileType", {
-    pattern = "python",
+    pattern = { "python", "rust" },
     command = [[setlocal shiftwidth=4 tabstop=4 expandtab]],
-    group = pythonIndentFix,
+    group = indentByFour,
   })
 
-  -- Exit if NERDTree is the only open window
-  local exitSoloNerdTree = api.nvim_create_augroup("ExitSoloNERDTree", { clear = true })
+  -- Exit if nvim-tree is the only open window after closing other windows
+  local NvimTreeClose = vim.api.nvim_create_augroup("NvimTreeClose", {clear = true})
   api.nvim_create_autocmd("BufEnter", {
-    pattern = "*",
-    command = [[if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif]]
+    pattern = "NvimTree_*",
+    callback = function()
+      local layout = vim.api.nvim_call_function("winlayout", {})
+      if layout[1] ~= "leaf" then return end
+      if layout[2] == nil then return end
+      if layout[3] ~= nil then return end
+      local buf = vim.api.nvim_win_get_buf(layout[2])
+      local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+      if filetype == "NvimTree" then
+        vim.cmd("confirm quit")
+      end
+    end,
+    group = NvimTreeClose,
+  })
+
+
+
+  -- Set keybindings specific to NERDTree
+  local nerdTreeKeyBindings = api.nvim_create_augroup("NERDTreeKeyBindings", { clear = true })
+  api.nvim_create_autocmd("FileType", {
+    pattern = "nerdtree",
+    command = [[nnoremap <buffer><leader><leader> q :quit<CR>]],
+    group = nerdTreeKeyBindings,
   })
 
 end

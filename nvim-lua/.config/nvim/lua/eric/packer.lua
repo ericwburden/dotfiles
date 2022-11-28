@@ -24,17 +24,22 @@ return require('packer').startup(function(use)
   use 'arcticicestudio/nord-vim'      -- Nord colorscheme
   use 'jiangmiao/auto-pairs'          -- Auto bracket pairs
   use 'jpalardy/vim-slime'            -- Vim SLIME -> Send text to REPL
-  use 'mfussenegger/nvim-dap'         -- DAP for Rust
-  use 'neovim/nvim-lspconfig'         -- LSP Common Configurations
   use 'nvim-lualine/lualine.nvim'     -- Status line
   use 'nvim-telescope/telescope.nvim' -- Telescope fuzzy finder
-  use 'preservim/nerdtree'            -- NERDTree file explorer
-  use 'ryanoasis/vim-devicons'        -- NERDTree file type icons
-  use 'simrat39/rust-tools.nvim'      -- LSP Extra Rust Tools
   use 'tpope/vim-commentary'          -- Code commenting hotkeys
   use 'tpope/vim-fugitive'            -- Git client integration
   use 'windwp/nvim-ts-autotag'        -- Auto closing tags
   use 'Xuyuanp/nerdtree-git-plugin'   -- NERDTree Git icons
+
+  -- LSP Plugins and setup
+  use "williamboman/mason.nvim"       -- LSP Installer GUI
+  use 'mfussenegger/nvim-dap'         -- DAP for Rust
+  use 'neovim/nvim-lspconfig'         -- LSP Common Configurations
+  use 'simrat39/rust-tools.nvim'      -- LSP Extra Rust Tools
+
+  -- File Explorer
+  use 'nvim-tree/nvim-tree.lua'
+  use 'nvim-tree/nvim-web-devicons'
 
   -- Code Completion Plugins
   use 'hrsh7th/nvim-cmp'              -- Code Completion
@@ -42,10 +47,11 @@ return require('packer').startup(function(use)
   use 'hrsh7th/cmp-buffer'            -- Completion Source: Buffer
   use 'hrsh7th/cmp-vsnip'             -- Completion Source: vsnip
   use 'hrsh7th/vim-vsnip'             -- Completion Source: vsnip
+  use "rafamadriz/friendly-snippets"  -- Community snippets
 
   -- Tabnine completion
   use {
-    'tzachar/cmp-tabnine', 
+    'tzachar/cmp-tabnine',
     run = './install.sh',
     requires = 'hrsh7th/nvim-cmp'
   }
@@ -55,6 +61,9 @@ return require('packer').startup(function(use)
     'nvim-treesitter/nvim-treesitter',
     run = ':TSUpdate',
   }
+
+  -- Use telescope as the default picker
+  use 'nvim-telescope/telescope-ui-select.nvim'
 
 
   -- Automatically set up your configuration after cloning packer.nvim
