@@ -89,3 +89,5 @@ eval "$(direnv hook zsh)"   # Hook direnv into shell
 eval "$(starship init zsh)" # Initialize Starship prompt
 
 tmux source ~/.config/tmux/tmux.conf
+-e 
+alias luamake=/luamake
