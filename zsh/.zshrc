@@ -10,7 +10,7 @@
 ########################################################################################
 
 export ZSH="/home/eric/.oh-my-zsh"
-export PATH="$PATH:$HOME/.local/bin:$HOME/.npm-global/bin:$HOME/.local/share/gem/ruby/3.0.0/bin"
+export PATH="$PATH:$HOME/.local/bin:$HOME/.npm-global/bin:$HOME/.local/bin/scripts"
 export VISUAL=nvim
 export EDITOR=nvim
 export XDG_CONFIG_HOME=~/.config
@@ -52,8 +52,7 @@ plugins=(git
          ripgrep
          rust
          zsh-autosuggestions
-         zsh-syntax-highlighting
-         zsh-dircolors-solarized)
+         zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -76,6 +75,7 @@ alias ll='exa -l'
 alias lsa='exa -a'
 alias lla='exa -la'
 alias k8='kubectl'
+alias weather='curl wttr.in'
 
 
 ########################################################################################
@@ -89,5 +89,4 @@ eval "$(direnv hook zsh)"   # Hook direnv into shell
 eval "$(starship init zsh)" # Initialize Starship prompt
 
 tmux source ~/.config/tmux/tmux.conf
--e 
 alias luamake=/luamake
