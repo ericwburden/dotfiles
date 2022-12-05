@@ -29,6 +29,14 @@ if vim.fn.has "nvim-0.7" then
     group = indentByFour,
   })
 
+  -- Default Nord comments are too dark, brighten them up a bit
+  local nordThemeOverrides = api.nvim_create_augroup("NordThemeOverrides", { clear = true })
+  api.nvim_create_autocmd("ColorScheme", {
+    pattern = "nord",
+    command = [[highlight Comment ctermfg=13 guifg=#D8DEE9]],
+    group = nordThemeOverrides,
+  })
+
   -- Exit if nvim-tree is the only open window after closing other windows
   local NvimTreeClose = vim.api.nvim_create_augroup("NvimTreeClose", {clear = true})
   api.nvim_create_autocmd("BufEnter", {
