@@ -55,8 +55,6 @@ if vim.fn.has "nvim-0.7" then
     group = NvimTreeClose,
   })
 
-
-
   -- Set keybindings specific to NERDTree
   local nerdTreeKeyBindings = api.nvim_create_augroup("NERDTreeKeyBindings", { clear = true })
   api.nvim_create_autocmd("FileType", {
@@ -65,4 +63,14 @@ if vim.fn.has "nvim-0.7" then
     group = nerdTreeKeyBindings,
   })
 
+  -- Detect *.pl files as Prolog files
+  local detectPrologFiles = api.nvim_create_augroup("DetectPrologFiles", { clear = true })
+  api.nvim_create_autocmd("BufRead", {
+    pattern = "*.pl",
+    command = [[set filetype=prolog]],
+    group = detectPrologFiles,
+  })
+
 end
+
+

@@ -90,3 +90,10 @@ eval "$(starship init zsh)" # Initialize Starship prompt
 
 tmux source ~/.config/tmux/tmux.conf
 alias luamake=/luamake
+
+export PATH="/home/eric/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
