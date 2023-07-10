@@ -33,7 +33,7 @@ return require('packer').startup(function(use)
 
   -- LSP Plugins and setup
   use "williamboman/mason.nvim"       -- LSP Installer GUI
-  use 'mfussenegger/nvim-dap'         -- DAP for Rust
+  use 'mfussenegger/nvim-dap'         -- Debug Adapter Protocol
   use 'neovim/nvim-lspconfig'         -- LSP Common Configurations
   use 'simrat39/rust-tools.nvim'      -- LSP Extra Rust Tools
 
