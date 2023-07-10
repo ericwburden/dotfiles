@@ -1,0 +1,17 @@
+#! /bin/bash
+
+current_dir="$(pwd)"
+build_dir="$current_dir/build"
+
+if [ -d $build_dir ]
+then
+  cd $build_dir
+  make
+else
+  mkdir $build_dir
+  cd $build_dir
+  cmake -G "Unix Makefiles" $current_dir
+  make
+fi
+
+cd $current_dir
